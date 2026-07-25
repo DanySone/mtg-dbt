@@ -17,3 +17,6 @@ logs/
 
 # env
 .env
+
+# extractor
+extractor/temp/

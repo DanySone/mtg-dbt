@@ -17,3 +17,9 @@ logs/
 
 # env
 .env
+
+# extractor
+extractor/temp/
+
+# Claude Code local settings
+.claude/settings.local.json

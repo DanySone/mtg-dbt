@@ -37,12 +37,14 @@ SCHEMA = [
 ]
 
 
-def get_download_uri(bulk_type: str) -> str:
+def get_download_uri(bulk_type: str) -> tuple[str, str]:
+    """Returns (download_uri, updated_at) for the matching bulk-data entry.
+    updated_at is Scryfall's own snapshot timestamp, not our fetch time."""
     resp = requests.get(BULK_DATA_URL, headers={"User-Agent": USER_AGENT}, timeout=30)
     resp.raise_for_status()
     for entry in resp.json()["data"]:
         if entry["type"] == bulk_type:
-            return entry["download_uri"]
+            return entry["download_uri"], entry["updated_at"]
     raise ValueError(f"Aucune entrée de type '{bulk_type}' dans bulk-data")
 
 
@@ -59,7 +61,10 @@ def download(uri: str, dest: Path) -> Path:
 def to_ndjson(source: Path, fetch_date: str, fetched_at: str) -> tuple[Path, int]:
     """Scryfall bulk files are one card object per line (`[`/`]` alone on
     their own lines), so this streams line-by-line instead of json.load-ing
-    the whole array into memory."""
+    the whole array into memory. Verified 2026-07-25 against the live
+    default_cards download (byte-range requests over the ~600MB file):
+    line 1 is `[`, every card is one line ending in `},`, the last card has
+    no trailing comma, and the final line is `]`."""
     dest = source.with_suffix(".ndjson")
     count = 0
     with open(source, encoding="utf-8") as f_in, open(dest, "w", encoding="utf-8") as f_out:
@@ -124,8 +129,12 @@ def main() -> None:
     client = bigquery.Client(project=BQ_PROJECT)
 
     try:
-        uri = get_download_uri(BULK_TYPE)
+        uri, updated_at = get_download_uri(BULK_TYPE)
+        logger.info("Snapshot Scryfall (updated_at): %s", updated_at)
+
         raw_path = download(uri, TEMP_DIR / f"scryfall_{BULK_TYPE}_{fetch_date}.json")
+        logger.info("Fichier téléchargé: %.1f MB", raw_path.stat().st_size / 1_000_000)
+
         ndjson_path, card_count = to_ndjson(raw_path, fetch_date, fetched_at)
 
         prev_count = previous_card_count(client, fetch_date)

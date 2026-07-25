@@ -47,18 +47,22 @@ class GetDownloadUriTest(unittest.TestCase):
         resp.json.return_value = {"data": entries}
         return resp
 
-    def test_returns_uri_for_matching_bulk_type(self):
+    def test_returns_uri_and_updated_at_for_matching_bulk_type(self):
         entries = [
-            {"type": "rulings", "download_uri": "https://example.com/rulings.json"},
-            {"type": "default_cards", "download_uri": "https://example.com/default_cards.json"},
+            {"type": "rulings", "download_uri": "https://example.com/rulings.json",
+             "updated_at": "2026-07-24T09:00:00.000+00:00"},
+            {"type": "default_cards", "download_uri": "https://example.com/default_cards.json",
+             "updated_at": "2026-07-25T09:13:47.506+00:00"},
         ]
         with patch.object(scryfall.requests, "get", return_value=self._mock_bulk_data_response(entries)):
-            uri = scryfall.get_download_uri("default_cards")
+            uri, updated_at = scryfall.get_download_uri("default_cards")
 
         self.assertEqual(uri, "https://example.com/default_cards.json")
+        self.assertEqual(updated_at, "2026-07-25T09:13:47.506+00:00")
 
     def test_raises_when_bulk_type_missing(self):
-        entries = [{"type": "rulings", "download_uri": "https://example.com/rulings.json"}]
+        entries = [{"type": "rulings", "download_uri": "https://example.com/rulings.json",
+                    "updated_at": "2026-07-24T09:00:00.000+00:00"}]
         with patch.object(scryfall.requests, "get", return_value=self._mock_bulk_data_response(entries)):
             with self.assertRaises(ValueError):
                 scryfall.get_download_uri("default_cards")

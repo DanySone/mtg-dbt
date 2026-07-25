@@ -50,3 +50,8 @@ exits 1, and leaves the temp files in place for debugging.
 - **Raw JSON payload**: keeps the bronze layer schema-flexible — new
   Scryfall fields show up automatically without a migration, at the cost
   of downstream models needing to parse JSON.
+
+## Attribution
+
+Card data comes from [Scryfall's bulk data API](https://scryfall.com/docs/api/bulk-data).
+This project is not affiliated with or endorsed by Scryfall.

@@ -14,7 +14,11 @@ source as (
 
         ---------- ids
         cast(id as string) as id
-        , cast(oracle_id as string) as oracle_id
+        , coalesce(
+            cast(oracle_id as string)
+            , json_value(payload, '$.oracle_id')
+            , json_value(payload, '$.card_faces[0].oracle_id')
+        ) as oracle_id
         , cast(json_value(payload, '$.card_back_id') as string) as card_back_id
         , cast(json_value(payload, '$.illustration_id') as string) as illustration_id
         , cast(json_value(payload, '$.set_id') as string) as set_id

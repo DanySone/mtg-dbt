@@ -46,7 +46,6 @@ source as (
         , cast(json_value(payload, '$.set_uri') as string) as set_uri
         , cast(json_value(payload, '$.rarity') as string) as rarity
         , cast(json_value(payload, '$.type_line') as string) as type_line
-        , cast(json_value(payload, '$.cmc') as string) as cmc
         , cast(json_value(payload, '$.loyalty') as string) as loyalty
         , cast(json_value(payload, '$.frame') as string) as frame
         , cast(json_value(payload, '$.power') as string) as power
@@ -96,10 +95,13 @@ source as (
 
         ---------- numerics
         , cast(json_value(payload, '$.edhrec_rank') as integer) as edhrec_rank
-
+        , safe_cast(json_value(payload, '$.cmc') as numeric) as cmc
         , safe_cast(json_value(payload, '$.prices.usd') as numeric) as price_usd
         , safe_cast(json_value(payload, '$.prices.usd_foil') as numeric) as price_usd_foil
+        , safe_cast(json_value(payload, '$.prices.usd_etched') as numeric) as price_usd_etched
         , safe_cast(json_value(payload, '$.prices.eur') as numeric) as price_eur
+        , safe_cast(json_value(payload, '$.prices.eur_foil') as numeric) as price_eur_foil
+        , safe_cast(json_value(payload, '$.prices.eur_etched') as numeric) as price_eur_etched
         , safe_cast(json_value(payload, '$.prices.tix') as numeric) as price_tix
 
         ---------- arrays

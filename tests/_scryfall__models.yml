@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: stg_scryfall__cards
+    description: model description
+    columns:
+      - name: id
+        description: unique id of this specific print card
+        tests:
+          - not_null
+          - unique
+
+      - name: oracle_id
+        description: shared id acrossed all reprints
+        tests:
+          - not_null
+        
+      - name: card_name
+        description: name of the card
+        tests:
+          - not_null
+
+      - name: set_code
+        description: code of the set (3 characters)
+        tests:
+          - not_null

@@ -1,8 +1,0 @@
-mtg_commander:
-
-  target: dev
-  outputs:
-    dev:
-      type: duckdb
-      path: 'mtg_commander.duckdb'
-      threads: 24

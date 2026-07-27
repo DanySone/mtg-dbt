@@ -7,10 +7,10 @@ sources:
     config:
       freshness:
         warn_after:
-          count: 8
+          count: 2
           period: day
         error_after:
-          count: 12
+          count: 3
           period: day
         loaded_at_field: fetched_at
     tables:
